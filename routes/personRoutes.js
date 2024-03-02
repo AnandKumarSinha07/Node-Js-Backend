@@ -34,16 +34,16 @@ router.post('/',async(req,res)=>{
 
   router.get('/:workType',async(req,res)=>{
   try{
-    //Extract the worktype from the parameter
-    const workType= await req.params.workType;
-    // validation 
+    //Extract the worktype because it is of parameter type
+    const workType=  req.params.workType;
+    // validation check if the worktype is valid or not
     if(workType=='chef'|| workType=='waiter'|| workType=='manager'){
         const response=await person.find({work:workType})
         console.log('response fetched succesufully')
         res.status(200).json(response);
     }
     else{
-      res.status(404).json({error:'Internal server error'})
+      res.status(404).json({error:'Invalid work type'})
     }
   }catch(err){
     console.log(e);
@@ -55,9 +55,9 @@ router.post('/',async(req,res)=>{
 
 router.put('/:id',async(req,res)=>{
     try{
-      // step 1 to get the data
-      const personId=req.params.id;
-      const updatedPersonData=req.body;
+      
+      const personId=req.params.id;// Extract the id from the url parameter
+      const updatedPersonData=req.body;// update data for the person
       const response=await person.findByIdAndUpdate(personId,updatedPersonData,{
         new:true,// return the updated document
         runValidators:true,//run moongose validation
@@ -77,21 +77,22 @@ router.put('/:id',async(req,res)=>{
     }
 })
 
-router.delete('./:id',async(req,res)=>{
+router.delete('/:id',async(req,res)=>{ 
   try{
     const personId=req.params.id;
-    const response=await personId.findByIdAndRemove(personId);
+    const response=await person.findByIdAndDelete(personId);
     if(!response){
-      return req.status(404).json({error:'Person Not found'})
+      console.log('not deleted')
+      return res.status(404).json({error:'Person Not found'})
     }
     console.log("Data deleted succuesfully");
-    req.status(200).json({message:'person data delted'})
-  }
+    res.status(200).json({message:'person data delted'})
+   }
   
   catch(err){
 
-    console.log('Not able to delete');
-    req.status(500).json({error:'Internal Error'});
+    console.log(err);
+    res.status(500).json({err:'Internal Error'});
   }
      
      
